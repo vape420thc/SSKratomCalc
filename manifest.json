@@ -1,6 +1,6 @@
 {
-  "name": "เครื่องคำนวณน้ำกระท่อม",
-  "short_name": "น้ำกระท่อม",
+  "name": "SSKratomYMT",
+  "short_name": "เครื่องมือคำนวณวัตถุดิบผลิตน้ำกระท่อม",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
