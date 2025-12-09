@@ -1,314 +1,858 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เครื่องคำนวณวัตถุดิบน้ำกระท่อม</title>
+    <title>SSKratomYMT ส.สามสี</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap');
-
-        body {
-            background-color: #1a1a1a;
-            color: #b3ffb3;
-            font-family: 'Kanit', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --primary-darker: #2E7D32;
+            --secondary: #F44336;
+            --secondary-dark: #D32F2F;
+            --accent: #FF9800;
+            --accent-dark: #F57C00;
+            
+            --dark-bg: #1A1A1A;
+            --darker-bg: #121212;
+            --card-bg: #212121;
+            --card-bg-light: #303030;
+            
+            --text-light: #E0E0E0;
+            --text-muted: #BDBDBD;
+            --text-green: #81C784;
+            --text-yellow: #FFD54F;
+            
+            --border-radius: 16px;
+            --transition: all 0.3s ease;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        * {
             margin: 0;
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 0;
             box-sizing: border-box;
-            animation: fadeIn 0.5s ease-out;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #151515 50%, var(--darker-bg) 100%);
+            color: var(--text-light);
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
         }
-
-        .calculator-container {
-            background: linear-gradient(145deg, #222, #000);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 8px 8px 16px #0a0a0a, -8px -8px 16px #343434;
-            width: 90%;
-            max-width: 550px;
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(76, 175, 80, 0.02) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, var(--card-bg) 0%, var(--darker-bg) 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow), var(--glow);
+            overflow: hidden;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            position: relative;
+        }
+        
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark), var(--primary));
+            z-index: 10;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+            padding: 20px 15px;
             text-align: center;
+            position: relative;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.1);
         }
-
-        h1 {
-            color: #80ff80;
+        
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, var(--primary), var(--text-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .app-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: var(--text-muted);
+        }
+        
+        .app-content {
+            padding: 20px 15px;
+        }
+        
+        .input-section {
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px #004d00;
         }
-
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
         .input-group {
             margin-bottom: 15px;
+            position: relative;
         }
-
-        label {
+        
+        .input-group label {
             display: block;
-            font-size: 1.1em;
-            margin-bottom: 8px;
-            color: #c2ffc2;
-            text-align: left;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            z-index: 2;
+            font-size: 0.9rem;
+        }
+        
         input[type="number"] {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background-color: #333;
-            color: #d9ffd9;
-            font-size: 1em;
-            box-sizing: border-box;
-            text-align: center;
-            outline: none;
-        }
-
-        button {
-            padding: 12px 20px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(to right, #00cc00, #008000);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin: 0 10px;
-        }
-
-        button.reset {
-            background: linear-gradient(to right, #ff4d4d, #cc0000);
-        }
-
-        button:hover {
-            filter: brightness(1.1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .result-container {
-            margin-top: 30px;
-            background-color: rgba(0, 51, 0, 0.1);
-            padding: 20px;
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
             border-radius: 10px;
-            box-shadow: 4px 4px 8px rgba(0, 26, 0, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            font-family: 'Kanit', sans-serif;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .ratio-selector {
+            margin: 15px 0 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+        
+        .ratio-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .ratio-option {
+            flex: 1;
+            min-width: calc(33.333% - 6px);
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        
+        .ratio-option:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .ratio-option.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .ratio-option .ratio-value {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+        
+        .ratio-option .ratio-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-section {
+            margin-top: 25px;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
-
-        .result-container.show {
+        
+        .result-section.show {
             opacity: 1;
             transform: translateY(0);
         }
-
-        .result-section {
+        
+        .result-card {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: rgba(0, 51, 0, 0.3);
-            border: 1px solid rgba(0, 153, 0, 0.2);
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(76, 175, 80, 0.3);
         }
-
-        .result-section h3 {
-            color: #a3ffa3;
-            margin-top: 0;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 2px #003300;
-            border-bottom: 2px solid rgba(0, 153, 0, 0.5);
-            padding-bottom: 5px;
+        
+        .result-title {
+            color: var(--text-green);
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
+        
+        .result-ratio {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
         .result-item {
-            margin-bottom: 8px;
-            color: #c2ffc2;
-            font-size: 1.05em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            transition: var(--transition);
         }
+        
+        .result-item:hover {
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .result-item.highlight {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.2);
+        }
+        
+        .result-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .result-item.highlight .result-value {
+            color: var(--text-yellow);
+            font-size: 1.2rem;
+        }
+        
+        .floating-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            left: 20px;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateY(-150%);
+            transition: transform 0.5s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .floating-notification.show {
+            transform: translateY(0);
+        }
+        
+        .floating-notification i {
+            font-size: 1.1rem;
+        }
+        
+        .quick-settings {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+        
+        .quick-settings h3 {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .setting-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .setting-value {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .setting-input-small {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-light);
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        /* เอฟเฟกต์พิเศษ */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        /* ปรับปรุงสำหรับมือถือ */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .app-header {
+                padding: 15px 12px;
+            }
+            
+            .app-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .app-content {
+                padding: 15px 12px;
+            }
+            
+            .ratio-option {
+                min-width: calc(50% - 4px);
+                padding: 8px;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .result-item.highlight {
+                grid-column: span 1;
+            }
+            
+            .floating-notification {
+                top: 15px;
+                right: 15px;
+                left: 15px;
+            }
 
-        .note {
-            color: #8cff8c;
-            font-size: 0.9em;
-            margin-top: 15px;
-            font-style: italic;
+   footer {
+color: var(--text-green);
+        }
+        
+        /* ป้องกัน double tap zoom บนมือถือ */
+        * {
+            touch-action: manipulation;
         }
     </style>
 </head>
-
 <body>
-    <div class="calculator-container">
-        <h1>เครื่องคำนวณวัตถุดิบน้ำกระท่อม</h1>
-
-        <div class="input-group">
-            <label for="leafInput">ปริมาณใบกระท่อม (กก.):</label>
-            <input type="number" id="leafInput" placeholder="ระบุ (กก.)" min="0">
+    <div class="app-container">
+        <div class="app-header">
+            <h1><i class="fas fa-calculator"></i> •  SSKratomYMT  •</h1>
+            <p>เครื่องมือคำนวณวัตถุดิบผลิตน้ำกระท่อม ส.สามสี</p>
         </div>
-
-        <div class="input-group">
-            <label for="waterInput">ปริมาณน้ำ (ลิตร):</label>
-            <input type="number" id="waterInput" placeholder="ระบุ (ลิตร)" min="0">
-        </div>
-
-        <div class="input-group">
-            <label for="yieldInput">ปริมาณน้ำกระท่อมดิบที่ต้องการ (ลิตร):</label>
-            <input type="number" id="yieldInput" placeholder="ระบุ (ลิตร)" min="0">
-        </div>
-
-        <button id="calculateButton">คำนวณ</button>
-        <button id="resetButton" class="reset">รีเซ็ต</button>
-
-        <div class="result-container" id="resultContainer">
-            <h2>ผลลัพธ์การคำนวณ</h2>
-
-            <div class="result-section">
-                <h3>แบบบดใบกระท่อม</h3>
-                <p class="result-item" id="resultGroundLeaf"></p>
-                <p class="result-item" id="resultGroundWater"></p>
-                <p class="result-item" id="resultGroundYield"></p>
+        
+        <div class="app-content">
+            <div class="input-section">
+                <div class="section-title">
+                    <i class="fas fa-edit"></i> ข้อมูลที่ต้องการคำนวณ
+                </div>
+                
+                <div class="input-group">
+                    <label for="leafInput">
+                        <i class="fas fa-leaf"></i> ปริมาณใบกระท่อม (กก.)
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-leaf"></i>
+                        <input type="number" id="leafInput" placeholder="เช่น 1.5" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="waterInput">
+                        <i class="fas fa-tint"></i> ปริมาณน้ำ (ลิตร)
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-tint"></i>
+                        <input type="number" id="waterInput" placeholder="เช่น 22" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="yieldInput">
+                        <i class="fas fa-wine-bottle"></i> น้ำกระท่อมดิบที่ต้องการ (ลิตร)
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-wine-bottle"></i>
+                        <input type="number" id="yieldInput" placeholder="เช่น 15" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="ratio-selector">
+                    <div class="section-title">
+                        <i class="fas fa-sliders-h"></i> เลือกอัตราส่วน
+                    </div>
+                    <div class="ratio-options">
+                        <div class="ratio-option active" data-ratio="22">
+                            <div class="ratio-value">22:1</div>
+                            <div class="ratio-label">อัตราส่วนมาตรฐาน</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="22.5">
+                            <div class="ratio-value">22.5:1</div>
+                            <div class="ratio-label">อัตราส่วน #1</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="23">
+                            <div class="ratio-value">23:1</div>
+                            <div class="ratio-label">อัตราส่วน #2</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-settings">
+                    <h3><i class="fas fa-cog"></i> การตั้งค่าด่วน</h3>
+                    <div class="setting-row">
+                        <span class="setting-label">ขนาดขวด (มล.)</span>
+                        <input type="number" id="bottleSizeInput" class="setting-input-small" value="800" min="1" step="1">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">อัตราส่วนน้ำ:ผลผลิต</span>
+                        <input type="number" id="yieldRatioInput" class="setting-input-small" value="0.75" min="0.1" max="1" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="calculateButton">
+                        <i class="fas fa-calculator"></i> คำนวณ
+                    </button>
+                    <button class="btn btn-secondary" id="clearButton">
+                        <i class="fas fa-broom"></i> ล้าง
+                    </button>
+                </div>
             </div>
-
-            <div class="result-section">
-                <h3>แบบไม่บดใบ ( # 0.65 # )</h3>
-                <p class="result-item" id="resultNotGroundLeaf1"></p>
-                <p class="result-item" id="resultNotGroundWater1"></p>
-                <p class="result-item" id="resultNotGroundYield1"></p>
-            </div>
-
-            <div class="result-section">
-                <h3>แบบไม่บด ( # 0.63 # ) </h3>
-                <p class="result-item" id="resultNotGroundLeaf2"></p>
-                <p class="result-item" id="resultNotGroundWater2"></p>
-                <p class="result-item" id="resultNotGroundYield2"></p>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-title">
+                            <i class="fas fa-chart-bar"></i> ผลลัพธ์การคำนวณ
+                        </div>
+                        <div class="result-ratio" id="selectedRatioBadge">22:1</div>
+                    </div>
+                    
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-leaf"></i> ใบกระท่อม
+                            </div>
+                            <div class="result-value" id="resultLeaf">0.00 กก.</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-tint"></i> น้ำ
+                            </div>
+                            <div class="result-value" id="resultWater">0.00 ลิตร</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-label">
+                                <i class="fas fa-wine-bottle"></i> น้ำกระท่อมดิบ
+                            </div>
+                            <div class="result-value" id="resultYield">0.00 ลิตร</div>
+                        </div>
+                        
+                        <div class="result-item highlight">
+                            <div class="result-label">
+                                <i class="fas fa-box"></i> จำนวนขวด (<span id="bottleSizeDisplay">800</span> มล.)
+                            </div>
+                            <div class="result-value" id="resultBottles">0.00 ขวด</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <p class="note">**หมายเหตุ:** อัตราส่วนเหล่านี้เป็นค่าเฉพาะของ : SS789.Kratom # ส.สามสี # :</p>
+
+  <footer><p><center>© 2025 SSKratom-YMT • ส.สามสี</center></p></footer>
+    <div class="floating-notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>คำนวณเสร็จสิ้น!</span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ตัวแปรหลัก
             const leafInput = document.getElementById('leafInput');
             const waterInput = document.getElementById('waterInput');
             const yieldInput = document.getElementById('yieldInput');
+            const bottleSizeInput = document.getElementById('bottleSizeInput');
+            const yieldRatioInput = document.getElementById('yieldRatioInput');
             const calculateButton = document.getElementById('calculateButton');
-            const resetButton = document.getElementById('resetButton');
-            const resultContainer = document.getElementById('resultContainer');
-
-            const resultGroundLeaf = document.getElementById('resultGroundLeaf');
-            const resultGroundWater = document.getElementById('resultGroundWater');
-            const resultGroundYield = document.getElementById('resultGroundYield');
-
-            const resultNotGroundLeaf1 = document.getElementById('resultNotGroundLeaf1');
-            const resultNotGroundWater1 = document.getElementById('resultNotGroundWater1');
-            const resultNotGroundYield1 = document.getElementById('resultNotGroundYield1');
-
-            const resultNotGroundLeaf2 = document.getElementById('resultNotGroundLeaf2');
-            const resultNotGroundWater2 = document.getElementById('resultNotGroundWater2');
-            const resultNotGroundYield2 = document.getElementById('resultNotGroundYield2');
-
-            calculateButton.addEventListener('click', function() {
+            const clearButton = document.getElementById('clearButton');
+            const resultSection = document.getElementById('resultSection');
+            
+            // ตัวแปรอัตราส่วน
+            const ratioOptions = document.querySelectorAll('.ratio-option');
+            let selectedRatio = 22; // ค่าเริ่มต้น
+            
+            // ฟังก์ชันแสดงการแจ้งเตือน
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.querySelector('span').textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+            
+            // เลือกอัตราส่วน
+            ratioOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    ratioOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedRatio = parseFloat(this.getAttribute('data-ratio'));
+                    document.getElementById('selectedRatioBadge').textContent = `${selectedRatio}:1`;
+                    
+                    // คำนวณอัตโนมัติถ้ามีข้อมูลอยู่แล้ว
+                    if (leafInput.value || waterInput.value || yieldInput.value) {
+                        setTimeout(calculate, 100);
+                    }
+                });
+            });
+            
+            // โหลดการตั้งค่าจาก localStorage
+            function loadSettings() {
+                const settings = JSON.parse(localStorage.getItem('kratomSimpleSettings')) || {};
+                
+                if (settings.selectedRatio) {
+                    selectedRatio = settings.selectedRatio;
+                    ratioOptions.forEach(option => {
+                        if (parseFloat(option.getAttribute('data-ratio')) === selectedRatio) {
+                            option.classList.add('active');
+                        } else {
+                            option.classList.remove('active');
+                        }
+                    });
+                    document.getElementById('selectedRatioBadge').textContent = `${selectedRatio}:1`;
+                }
+                
+                if (settings.bottleSize) {
+                    bottleSizeInput.value = settings.bottleSize;
+                }
+                
+                if (settings.yieldRatio) {
+                    yieldRatioInput.value = settings.yieldRatio;
+                }
+            }
+            
+            // บันทึกการตั้งค่าไปยัง localStorage
+            function saveSettings() {
+                const settings = {
+                    selectedRatio: selectedRatio,
+                    bottleSize: bottleSizeInput.value,
+                    yieldRatio: yieldRatioInput.value
+                };
+                
+                localStorage.setItem('kratomSimpleSettings', JSON.stringify(settings));
+            }
+            
+            // ฟังก์ชันการคำนวณหลัก
+            function calculate() {
                 const leaf = parseFloat(leafInput.value) || 0;
                 const water = parseFloat(waterInput.value) || 0;
                 const yieldDesired = parseFloat(yieldInput.value) || 0;
-
+                const bottleSize = parseFloat(bottleSizeInput.value) || 800;
+                const yieldRatio = parseFloat(yieldRatioInput.value) || 0.75;
+                
+                // ตรวจสอบข้อมูล
                 if (leaf < 0 || water < 0 || yieldDesired < 0) {
-                    alert('⚠️ กรุณากรอกค่าที่เป็นบวกเท่านั้น!');
+                    showNotification('⚠️ กรุณากรอกค่าที่เป็นบวกเท่านั้น!');
                     return;
                 }
-
-                let groundLeaf = 0, groundWater = 0, groundYield = 0;
-                let notGroundLeaf1 = 0, notGroundWater1 = 0, notGroundYield1 = 0;
-                let notGroundLeaf2 = 0, notGroundWater2 = 0, notGroundYield2 = 0;
-
-                // อัตราส่วนสำหรับวิธีบด
-                const groundRatioLeafToWater = 20; // กก. ใบ : ลิตร น้ำ
-                const groundRatioWaterToYield = 15 / 20; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
-
-                // อัตราส่วนสำหรับวิธีไม่บด ( # 0.65 # )
-                const notGroundRatioLeafToWater1 = 15.38; // กก. ใบ : ลิตร น้ำ
-                const notGroundRatioWaterToYield1 = 12 / 15.38; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
-
-                // อัตราส่วนสำหรับวิธีไม่บด ( # 0.63 # )
-                const notGroundRatioLeafToWater2 = 15.873; // กก. ใบ : ลิตร น้ำ
-                const notGroundRatioWaterToYield2 = 12 / 15.873; // ลิตร น้ำ : ลิตร น้ำกระท่อมดิบ
-
+                
+                if (leaf === 0 && water === 0 && yieldDesired === 0) {
+                    showNotification('⚠️ กรุณากรอกข้อมูลอย่างน้อยหนึ่งช่อง!');
+                    return;
+                }
+                
+                let resultLeaf, resultWater, resultYield;
+                
+                // คำนวณตามช่องที่กรอก
                 if (leaf > 0) {
-                    groundLeaf = leaf;
-                    groundWater = leaf * groundRatioLeafToWater;
-                    groundYield = groundWater * groundRatioWaterToYield;
-
-                    notGroundLeaf1 = leaf;
-                    notGroundWater1 = leaf * notGroundRatioLeafToWater1;
-                    notGroundYield1 = notGroundWater1 * notGroundRatioWaterToYield1;
-
-                    notGroundLeaf2 = leaf;
-                    notGroundWater2 = leaf * notGroundRatioLeafToWater2;
-                    notGroundYield2 = notGroundWater2 * notGroundRatioWaterToYield2;
-
+                    resultLeaf = leaf;
+                    resultWater = leaf * selectedRatio;
+                    resultYield = resultWater * yieldRatio;
                 } else if (water > 0) {
-                    groundWater = water;
-                    groundLeaf = water / groundRatioLeafToWater;
-                    groundYield = water * groundRatioWaterToYield;
-
-                    notGroundWater1 = water;
-                    notGroundLeaf1 = water / notGroundRatioLeafToWater1;
-                    notGroundYield1 = water * notGroundRatioWaterToYield1;
-
-                    notGroundWater2 = water;
-                    notGroundLeaf2 = water / notGroundRatioLeafToWater2;
-                    notGroundYield2 = water * notGroundRatioWaterToYield2;
-
+                    resultWater = water;
+                    resultLeaf = water / selectedRatio;
+                    resultYield = water * yieldRatio;
                 } else if (yieldDesired > 0) {
-                    groundYield = yieldDesired;
-                    groundWater = yieldDesired / groundRatioWaterToYield;
-                    groundLeaf = groundWater / groundRatioLeafToWater;
-
-                    notGroundYield1 = yieldDesired;
-                    notGroundWater1 = yieldDesired / notGroundRatioWaterToYield1;
-                    notGroundLeaf1 = notGroundWater1 / notGroundRatioLeafToWater1;
-
-                    notGroundYield2 = yieldDesired;
-                    notGroundWater2 = yieldDesired / notGroundRatioWaterToYield2;
-                    notGroundLeaf2 = notGroundWater2 / notGroundRatioLeafToWater2;
-
-                } else {
-                    alert('⚠️ กรุณากรอกค่าข้อมูลอย่างน้อยหนึ่งช่อง!');
-                    return;
+                    resultYield = yieldDesired;
+                    resultWater = yieldDesired / yieldRatio;
+                    resultLeaf = resultWater / selectedRatio;
                 }
-
-                resultGroundLeaf.textContent = `ใบกระท่อม: ${groundLeaf.toFixed(2)} กก.`;
-                resultGroundWater.textContent = `น้ำ: ${groundWater.toFixed(2)} ลิตร`;
-                resultGroundYield.textContent = `น้ำกระท่อมดิบ: ${groundYield.toFixed(2)} ลิตร`;
-
-                resultNotGroundLeaf1.textContent = `ใบกระท่อม: ${notGroundLeaf1.toFixed(2)} กก.`;
-                resultNotGroundWater1.textContent = `น้ำ: ${notGroundWater1.toFixed(2)} ลิตร`;
-                resultNotGroundYield1.textContent = `น้ำกระท่อมดิบ: ${notGroundYield1.toFixed(2)} ลิตร`;
-
-                resultNotGroundLeaf2.textContent = `ใบกระท่อม: ${notGroundLeaf2.toFixed(2)} กก.`;
-                resultNotGroundWater2.textContent = `น้ำ: ${notGroundWater2.toFixed(2)} ลิตร`;
-                resultNotGroundYield2.textContent = `น้ำกระท่อมดิบ: ${notGroundYield2.toFixed(2)} ลิตร`;
-
-                resultContainer.classList.add('show');
-            });
-
-            resetButton.addEventListener('click', function() {
+                
+                // คำนวณจำนวนขวด
+                const bottleSizeLiters = bottleSize / 1000;
+                const resultBottles = (resultYield / bottleSizeLiters).toFixed(2);
+                
+                // แสดงผลลัพธ์
+                document.getElementById('resultLeaf').textContent = `${resultLeaf.toFixed(2)} กก.`;
+                document.getElementById('resultWater').textContent = `${resultWater.toFixed(2)} ลิตร`;
+                document.getElementById('resultYield').textContent = `${resultYield.toFixed(2)} ลิตร`;
+                document.getElementById('resultBottles').textContent = `${resultBottles} ขวด`;
+                document.getElementById('bottleSizeDisplay').textContent = bottleSize;
+                
+                // แสดงผลลัพธ์ด้วยเอฟเฟกต์
+                resultSection.classList.add('show');
+                resultSection.classList.add('pulse');
+                
+                // บันทึกการตั้งค่า
+                saveSettings();
+                
+                // แสดงการแจ้งเตือน
+                showNotification('คำนวณเสร็จสิ้น!');
+                
+                // ลบเอฟเฟกต์ pulse หลังจากอนิเมชันเสร็จ
+                setTimeout(() => {
+                    resultSection.classList.remove('pulse');
+                }, 500);
+            }
+            
+            // ฟังก์ชันล้างข้อมูล
+            function clearAll() {
                 leafInput.value = '';
                 waterInput.value = '';
                 yieldInput.value = '';
-                resultContainer.classList.remove('show');
+                resultSection.classList.remove('show');
+                showNotification('ล้างข้อมูลแล้ว');
+            }
+            
+            // Event Listeners
+            calculateButton.addEventListener('click', calculate);
+            clearButton.addEventListener('click', clearAll);
+            
+            // คำนวณอัตโนมัติเมื่อกรอกข้อมูลและกด Enter
+            [leafInput, waterInput, yieldInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value && (leafInput.value || waterInput.value || yieldInput.value)) {
+                        // รอให้ผู้ใช้พิมพ์เสร็จก่อนคำนวณ
+                        clearTimeout(window.inputTimeout);
+                        window.inputTimeout = setTimeout(calculate, 500);
+                    }
+                });
+                
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        calculate();
+                    }
+                });
             });
+            
+            // คำนวณเมื่อเปลี่ยนการตั้งค่า
+            bottleSizeInput.addEventListener('change', function() {
+                if (leafInput.value || waterInput.value || yieldInput.value) {
+                    calculate();
+                }
+            });
+            
+            yieldRatioInput.addEventListener('change', function() {
+                if (leafInput.value || waterInput.value || yieldInput.value) {
+                    calculate();
+                }
+            });
+            
+            // โหลดการตั้งค่าเมื่อเริ่มต้น
+            loadSettings();
+            
+            // โฟกัสที่ช่องแรกเมื่อโหลดหน้าเสร็จ
+            setTimeout(() => {
+                leafInput.focus();
+            }, 300);
         });
     </script>
-
 </body>
-
 </html>
-
